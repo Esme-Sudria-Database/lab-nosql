@@ -9,9 +9,9 @@ services:
       - /data/db 
       - ./esme_mongodb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
   
-  esme_admin:
+  esme_mongo_console:
     build:
-      context: ./esme_admin
+      context: ./esme_mongo_nosqlclient
     ports:
       - "3000:3000"
     environment:
@@ -25,3 +25,25 @@ services:
       - "7681:7681"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  esme_elasticsearch:
+    build:
+      context: ./esme_elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - /usr/share/elasticsearch/data
+
+  esme_elasticsearch_console:
+    build:
+      context: ./esme_elasticsearch_kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://esme_elasticsearch:9200
+    volumes: []
